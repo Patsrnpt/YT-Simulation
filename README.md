@@ -34,7 +34,7 @@ This repository includes 2 different parts to process the data:
     * **`visualization.py`**: Plotting tools for creating Projection plots, Phase plots, and Spectra.
     * **`yt_fields.py`**: Integrates the calculated quantities into the `yt` package as derived fields.
 
-* **'yt_example.ipynb'**: This Jupyter notebook provides a command of how to simulate a projection plot, a phase plot, and a spectrum of your dataset using the functions provided in the library folder.
+* **'visualization_example.ipynb'**: This Jupyter notebook provides a command of how to simulate a projection plot, a phase plot, and a spectrum of your dataset using the functions provided in the library folder.
 
 ---
 
