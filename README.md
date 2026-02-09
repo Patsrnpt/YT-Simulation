@@ -3,7 +3,7 @@
 This repository provides tools for visualizing astronomical datasets using the `yt` package, specifically optimized for JWST filter integration.
 
 ## Quick Start:
-To simulate these datasets without errors, you will need three things: **filter profiles**, a **dataset**, and the **analysis notebooks**.
+To simulate these datasets without errors, you will need three things: **filter profiles**, a **dataset**, and the **coding notebooks**.
 
 ### 1. JWST Filter Profiles
 This project requires a JWST filter file.
