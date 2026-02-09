@@ -24,7 +24,7 @@ Because the raw data folder size is very large, it exceeds GitHub's standard upl
 
 ### 3. Coding Files
 This repository includes 2 different files to process the data:
-1. **'yt_function.ipynb'**: This Jupyter notebook provides all the functions with descriptions you need to know to simulate the plots. This notebook can be found here: [View Function Notebook](./yt_function.ipynb)
-2. **'yt_example.ipynb'**: This Jupyter notebook provides a command of how to simulate a projection plot, a phase plot, and a spectrum of your dataset using all functions provided in 'yt_function.ipynb'. This notebook can be found here: [View Command Notebook](./yt_example.ipynb)
+1. **'yt_function.ipynb'**: This Jupyter notebook provides all the functions with descriptions you need to know to simulate the plots. This notebook can be found here: [Function Notebook](./yt_function.ipynb)
+2. **'yt_example.ipynb'**: This Jupyter notebook provides a command of how to simulate a projection plot, a phase plot, and a spectrum of your dataset using all functions provided in 'yt_function.ipynb'. This notebook can be found here: [Example Notebook](./yt_example.ipynb)
 
 If you have any questions, feel free to contact me via this email: [sphoom22@terpmail.umd.edu](mailto:sphoom22@terpmail.umd.edu)
