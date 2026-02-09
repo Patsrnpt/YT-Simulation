@@ -1,4 +1,4 @@
-# YT-Simulation: JWST Data Visualization
+# YT-Simulation: Data Visualization
 
 This repository provides tools for visualizing astronomical datasets using the `yt` package, specifically optimized for JWST filter integration.
 
