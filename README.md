@@ -5,7 +5,7 @@ This repository provides tools for visualizing astronomical datasets using the `
 ## Quick Start:
 To simulate these datasets without errors, you will need three things: **filter profiles**, a **dataset**, and the **coding notebooks**.
 
-### 1. JWST Filter Profiles
+### 1. JWST Filter Profile
 This project requires a JWST filter file.
 * **Custom Filters:** Download official profiles from the [NIRCam Filters website](https://jwst-docs.stsci.edu/jwst-near-infrared-camera/nircam-instrumentation/nircam-filters).
 * **Included Example:** If you don't know what filter you want to try with this code, I have provided the [F200W filter txt file](./F200W_filter.txt) in this repo as an example.
