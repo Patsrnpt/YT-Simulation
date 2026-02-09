@@ -42,7 +42,7 @@ This repository includes 2 different parts to process the data:
 To use these functions in your notebook, you must import them from the library folder:
 
 ```python
-# Import the analysis pipeline from the library folder
+# import all related functions from the library folder
 from library.calculate_quantities import *
 from library.continuum_grid import *
 from library.filter_tools import *
