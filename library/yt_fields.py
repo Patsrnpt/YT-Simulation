@@ -1,8 +1,36 @@
+import numpy as np
+
 # function to add flux fields to yt package
 def add_flux_fields(ds, interp_funcs, min_temp, max_temp, min_dense, max_dense, he_h_ratio = 0.1):
-    """"
+    """
     Add interpolated flux fields (bound-free, two-photon, free-free, total) to the yt dataset.
-    Automatically detects and processes single or multiple filters.
+    Automatically detects and processes single or multiple filters based on the structure of interp_funcs.
+    
+    Parameters:
+    -----------
+    - ds (yt dataset): The dataset to add fields to
+    - interp_funcs (dict): Dictionary containing interpolation functions returned by compute_continuum_grid():
+        
+        Case 1: Single filter (when compute_continuum_grid receives 1D filter_wl and filter_output)
+            - Keys: "contH", "cont2p", "contff"
+            - Values: LinearNDInterpolator objects
+            
+        Case 2: Multiple filters (when compute_continuum_grid receives 2D filter_wl and filter_output)
+            - Keys: "filter_01", "filter_02", etc.
+            - Values: Dictionaries with keys "contH", "cont2p", "contff" containing LinearNDInterpolator objects
+    
+    - min_temp (float): Minimum temperature for clipping (in K)
+    - max_temp (float): Maximum temperature for clipping (in K)
+    - min_dense (float): Minimum number density for clipping (in cm^-3)
+    - max_dense (float): Maximum number density for clipping (in cm^-3)
+    - he_h_ratio (float, optional): Helium to hydrogen abundance ratio (default: 0.1)
+    
+    Returns:
+    --------
+    - ds: yt dataset with added flux fields
+    - filter_list: list of filter numbers that were processed 
+        - Multiple filters: ['01', '02', '03', ...]
+        - Single filter: ['01']
     """
     
     # check if we have multiple filters by checking if keys start with "filter_"

@@ -1,7 +1,29 @@
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+import yt
+from library.calculate_quantities import calculate_filter_width, flux_to_surface_brightness, flux_to_magnitude
+
 # function to visualize projection plot
-def create_projection_plot(ds, field_name, ctr_at_code, z, distance_pc, plt_wdth = 400, plot_units = "flux", axis_units = "arcsec", filter_path = None):
+def create_projection_plot(ds, field_name, ctr_at_code, z = None, distance_pc = None, plt_wdth = 400, plot_units = "flux", axis_units = "arcsec", filter_path = None):
     """"
     Create a projection plot of a specific flux field.
+
+    Parameters:
+    ----------
+    ds: yt dataset object
+    field_name (str): name of the field to project
+    ctr_at_code (np.ndarray): center of the plot in code units
+    plt_wdth (float): width of the plot in parsecs
+    plot_units (str): "flux", "jy_arcsec", or "magnitude"
+    z (float): redshift for unit conversion
+    distance_pc (float): distance to object for angular size calculation
+    axis_units (str): "arcsec" or "pc"
+    filter_path (str): path to filter file for accurate delta_wl calculation
+
+    Outputs:
+    -------
+    None: displays the matplotlib figure
     """
 
     # create projection to get data
@@ -55,6 +77,20 @@ def create_projection_plot(ds, field_name, ctr_at_code, z, distance_pc, plt_wdth
 def create_phase_plot(ad, x_field = "density", y_field = "temperature", z_field = "flux_total", x_bins = None, y_bins = None, weight_field = None):
     """"
     Create a phase plot showing distribution of flux across two variables.
+
+    Parameters:
+    ----------
+    ad: yt all_data container
+    x_field (str): field for x-axis
+    y_field (str): field for y-axis
+    z_field (str): flux field to be binned
+    x_bins (tuple): (min, max) for x-axis
+    y_bins (tuple): (min, max) for y-axis
+    weight_field (str): field to weight the distribution
+
+    Outputs:
+    -------
+    None: displays the yt phase plot
     """
 
     plot = yt.PhasePlot(ad, x_field, y_field, [z_field], weight_field = weight_field)
@@ -73,7 +109,22 @@ def create_phase_plot(ad, x_field = "density", y_field = "temperature", z_field 
 # function to calculate related variable to the spectrum
 def create_spectrum_plot(ds, filter_list, z, filter_dir, flux_type = "total", plot_units = "flux"):
     """"
-    Create a spectrum plot from multiple filter bins.
+    Calculate necessary variables for spectra.
+
+    Parameters:
+    ----------
+    ds: yt dataset object
+    filter_list (list): list of filter numbers
+    flux_type (str): "total", "contH", "cont2p", or "contff"
+    plot_units (str): "flux", "jy_arcsec2", or "magnitude_arcsec2"
+    z (float): redshift for unit conversion
+    filter_dir (str): directory containing the filter .txt files
+
+    Outputs:
+    -------
+    centers_wl (list): central wavelengths in microns
+    y_values (list): processed flux values
+    plot_units (str): the units used for the y-axis
     """
 
     centers_wl = []

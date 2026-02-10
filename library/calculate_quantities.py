@@ -1,3 +1,6 @@
+import numpy as np
+import os
+
 # function use to calculate resolution of the filter
 def calculate_original_resolution(wavelength):         
     wavelength_array = np.array(wavelength)

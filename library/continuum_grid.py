@@ -1,8 +1,42 @@
+import os
+import numpy as np
+import pandas as pd
+from pyneb import Continuum
+from scipy.interpolate import interp1d, LinearNDInterpolator
+
 # function to calculate continuum grid
 def compute_continuum_grid(min_temp, max_temp, num_temp_grid, min_dense, max_dense, num_dense_grid, min_wl, max_wl, num_wl_grid, filter_wl = None, filter_output = None, save_dir = None):
-    """"
-    Compute continuum flux (bound-free, two-photon, free-free) over a grid of temperature and number density.
-    This function will also create variables like df01, df02 in your notebook for easy access.
+    """
+    Compute continuum flux (bound-free, two-photon, free-free) over a grid of temperature and number density, 
+    which will be used as a reference to calculate flux value of each pixel in the real object.
+
+    Parameters:
+    -----------
+    - min_temp (float): minimum temperature in your grid (in K)
+    - max_temp (float): maximum temperature in your grid (in K)
+    - num_temp_grid (int): number of data points in temperature grid
+    - min_dense (float): minimum number density in your grid (in cm^-3)
+    - max_dense (float): maximum number density in your grid (in cm^-3)
+    - num_dense_grid (int): number of data points in density grid
+    - min_wl (float): minimum wavelength of your pixel (in A). Keep in mind that this value for continuum cannot be smaller than 912 A
+    - max_wl (float): maximum wavelength of your pixel (in A). Keep in mind that this value for continuum cannot be larger than 1e5 A
+    - num_wl_grid (int): number of data points in wavelength grid
+    - filter_wl (array): filter's wavelength range, which is what you prepare using prepare_simulation_data function
+        - 1D array for single filter
+        - 2D array (n_filters, n_wavelength_points) for multiple filters
+    - filter_output (array): filter's transmission profile within your filter range, which is what you prepare using prepare_simulation_data function
+        - 1D array for single filter
+        - 2D array (n_filters, n_wavelength_points) for multiple filters
+    - save_dir (str or None): directory to save dataframe files. If None, creates 'df_filter' folder in current directory.
+
+    Outputs:
+    --------
+    - df_results (DataFrame or dict): 
+        - single filter: DataFrame with T, n, and flux averages
+        - multiple filters: dictionary of DataFrames, keyed by filter index
+    - interp_funcs (dict or dict of dicts):
+        - single filter: dictionary of LinearNDInterpolator for each component
+        - multiple filters: dictionary of dictionaries, where each key is filter index and value is dict of interpolators
     """
 
     # build the grid for temperature, density, and wavelength

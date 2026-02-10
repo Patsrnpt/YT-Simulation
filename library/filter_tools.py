@@ -1,3 +1,7 @@
+import os
+import numpy as np
+from library.calculate_quantities import calculate_original_resolution
+
 # function to create the filter without redshifting
 def create_multiple_filter_files(output_dir, wl_initial, wl_final, num_filters = 20, jwst_filter_path = "F200W_filter.txt"):
     """"
