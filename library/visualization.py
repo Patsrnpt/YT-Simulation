@@ -5,7 +5,7 @@ import yt
 from library.calculate_quantities import calculate_filter_width, flux_to_surface_brightness, flux_to_magnitude
 
 # function to visualize projection plot
-def create_projection_plot(ds, field_name, ctr_at_code, z = None, distance_pc = None, plt_wdth = 400, plot_units = "flux", axis_units = "arcsec", filter_path = None):
+def create_projection_plot(ds, field_name, ctr_at_code, plt_wdth = 400, plot_units = None, z = None, distance_pc = None, axis_units = "arcsec", filter_path = None):
     """"
     Create a projection plot of a specific flux field.
 
@@ -37,7 +37,7 @@ def create_projection_plot(ds, field_name, ctr_at_code, z = None, distance_pc = 
         delta_wl = calculate_filter_width(filter_path)
 
     # unit conversion logic
-    if plot_units == "flux" or plot_units == None:
+    if plot_units == None:
         plot_data = np.log10(flux_data)
         colorbar_label = "log10(flux [erg s$^{-1}$ cm$^{-2}$])"
         cmap = "viridis"
@@ -57,12 +57,12 @@ def create_projection_plot(ds, field_name, ctr_at_code, z = None, distance_pc = 
     # axis extent
     if axis_units == "arcsec":
         pc_to_cm = 3.086e18
-        ang_rad = ((plt_wdth * pc_to_cm) / 2) / (distance_pc * pc_to_cm) * (180 / np.pi) * 3600
+        ang_rad = ((plt_wdth * pc_to_cm) / 2) / (distance_pc * pc_to_cm) * (180/np.pi) * 3600
         extent = [-ang_rad, ang_rad, -ang_rad, ang_rad]
     elif axis_units == "pc":
-        extent = [-plt_wdth / 2, plt_wdth / 2, -plt_wdth / 2, plt_wdth / 2]
+        extent = [-plt_wdth/2, plt_wdth/2, -plt_wdth/2, plt_wdth/2]
 
-    fig, ax = plt.subplots(figsize = (10, 8))
+    fig, ax = plt.subplots(figsize = (20, 10))
     im = ax.imshow(plot_data, extent = extent, cmap = cmap, origin = "lower")
     ax.set_xlabel(axis_units)
     ax.set_ylabel(axis_units)
@@ -106,10 +106,10 @@ def create_phase_plot(ad, x_field = "density", y_field = "temperature", z_field 
 
     return None
 
-# function to calculate related variable to the spectrum
-def create_spectrum_plot(ds, filter_list, z, filter_dir, flux_type = "total", plot_units = "flux"):
+# function to visualize spectrum
+def create_spectrum_plot(ds, filter_list, flux_type = None, plot_units = None, z = None, filter_dir = None):
     """"
-    Calculate necessary variables for spectra.
+    Create a spectrum plot from multiple filter bins.
 
     Parameters:
     ----------
@@ -131,6 +131,7 @@ def create_spectrum_plot(ds, filter_list, z, filter_dir, flux_type = "total", pl
     y_values = []
 
     for f_num in filter_list:
+        # handle different flux types based on field names
         if flux_type == "total":
             field = f"flux_total_filter_{f_num}"
         else:
@@ -141,6 +142,7 @@ def create_spectrum_plot(ds, filter_list, z, filter_dir, flux_type = "total", pl
             
         total_flux = float(ds.all_data()[("gas", field)].sum())
         
+        # load filter data to get center and width
         file_path = os.path.join(filter_dir, f"filter_{f_num}.txt")
         if not os.path.exists(file_path):
             continue
@@ -149,11 +151,13 @@ def create_spectrum_plot(ds, filter_list, z, filter_dir, flux_type = "total", pl
         mask = f_data[:, 1] > 0
         wls = f_data[:, 0][mask]
         
+        # calculate center in microns and width in angstroms
         center = (wls.max() + wls.min()) / 2
         delta_wl = (wls.max() - wls.min()) * 1e4
         
         centers_wl.append(center)
         
+        # unit conversion logic
         if plot_units == "flux" or plot_units == None:
             y_values.append(total_flux)
         else:
@@ -161,13 +165,8 @@ def create_spectrum_plot(ds, filter_list, z, filter_dir, flux_type = "total", pl
             sb = flux_to_surface_brightness(flux_per_A, z = z)
             
             if plot_units == "jy_arcsec2":
-                y_values.append(sb * 1e9) 
+                y_values.append(sb * 1e9) # convert to nJy
             elif plot_units == "magnitude_arcsec2":
                 y_values.append(flux_to_magnitude(sb, z = z))
-
-    # sort the data by wavelength for a proper spectrum line
-    sorted_indices = np.argsort(centers_wl)
-    centers_wl = np.array(centers_wl)[sorted_indices]
-    y_values = np.array(y_values)[sorted_indices]
 
     return centers_wl, y_values, plot_units
