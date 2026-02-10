@@ -38,17 +38,4 @@ This repository includes 2 different parts to process the data:
 
 ---
 
-### How to Import
-To use these functions in your notebook, you must import them from the library folder:
-
-```python
-# import all related functions from the library folder
-from library.calculate_quantities import *
-from library.continuum_grid import *
-from library.filter_tools import *
-from library.prepare_data import *
-from library.visualization import *
-from library.yt_fields import *
-```
-
 If you have any questions, feel free to contact me via this email: [sphoom22@terpmail.umd.edu](mailto:sphoom22@terpmail.umd.edu)
