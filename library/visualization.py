@@ -132,18 +132,19 @@ def create_spectrum_plot(ds, filter_list, flux_type = None, plot_units = None, z
 
     for f_num in filter_list:
         # handle different flux types based on field names
+        f_idx = int(f_num)
         if flux_type == "total":
-            field = f"flux_total_filter_{f_num}"
+            field = f"flux_total_filter_{f_idx:02d}"
         else:
-            field = f"flux_{flux_type}_filter_{f_num}"
-
+            field = f"flux_{flux_type}_filter_{f_idx:02d}"
+        
         if ("gas", field) not in ds.derived_field_list:
             continue
             
         total_flux = float(ds.all_data()[("gas", field)].sum())
         
         # load filter data to get center and width
-        file_path = os.path.join(filter_dir, f"filter_{f_num}.txt")
+        file_path = os.path.join(filter_dir, f"filter_{f_idx}.txt")
         if not os.path.exists(file_path):
             continue
             

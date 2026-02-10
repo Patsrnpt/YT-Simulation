@@ -7,8 +7,8 @@ from library.filter_tools import create_multiple_filter_files
 # function to prepare simulation data
 def prepare_simulation_data(input_path, cell_fields = None, epf = None, 
                             filter_path = None, z = 10, 
-                            filter_dir = None, wl_initial = 0.6, 
-                            wl_final = 2.3, num_bins = 20, 
+                            filter_dir = None, wl_initial = None, 
+                            wl_final = None, num_bins = 20, 
                             jwst_filter_file = "F200W_filter.txt"):
     """"
     Prepare simulation dataset, star particle positions, and load filter data. This function assumes that you already have input data.
@@ -21,10 +21,10 @@ def prepare_simulation_data(input_path, cell_fields = None, epf = None,
     - filter_path (str or None): 'F200W_filter.txt' to load JWST filter, None to create filters automatically
     - z (float): redshift to shift filter wavelengths to match galaxy rest frame
     - filter_dir (str): directory for filter bins (default: 'filter_bins' in current directory)
-    - wl_initial (float): starting wavelength in microns
-    - wl_final (float): ending wavelength in microns
+    - wl_initial (float or None): starting wavelength in microns; if None, tracks from jwst_filter_file
+    - wl_final (float or None): ending wavelength in microns; if None, tracks from jwst_filter_file
     - num_bins (int): number of filters to create
-    - jwst_filter_file (str): JWST filter for resolution reference
+    - jwst_filter_file (str): JWST filter for resolution reference and auto-limit tracking
 
     Returns:
     -------
@@ -76,6 +76,21 @@ def prepare_simulation_data(input_path, cell_fields = None, epf = None,
     # define variable to save wavelength and transmission profile of the shifted filter
     wavelength_filter_shifted = []
     output_filter = []
+
+    # handle automatic tracking of wavelength limits if not provided
+    if wl_initial is None or wl_final is None:
+        if os.path.isfile(jwst_filter_file):
+            ref_data = np.loadtxt(jwst_filter_file, skiprows = 1)
+            ref_mask = ref_data[:, 1] > 0
+            if wl_initial is None:
+                wl_initial = ref_data[:, 0][ref_mask].min()
+            if wl_final is None:
+                wl_final = ref_data[:, 0][ref_mask].max()
+            print(f"Auto-tracking limits from {jwst_filter_file}: {wl_initial:.4f}-{wl_final:.4f} microns")
+        else:
+            # fallback defaults if tracking file is missing
+            wl_initial = 0.6 if wl_initial is None else wl_initial
+            wl_final = 2.3 if wl_final is None else wl_final
 
     # create the filter for users if they don't have it
     if filter_path is None:
