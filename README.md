@@ -10,7 +10,7 @@ This project requires a JWST filter file.
 * **Custom Filters:** Download official profiles from the [NIRCam Filters website](https://jwst-docs.stsci.edu/jwst-near-infrared-camera/nircam-instrumentation/nircam-filters).
 * **Included Example:** If you don't know what filter you want to try with this code, I have provided the [F200W filter txt file](./F200W_filter.txt) in this repo as an example.
 
-### 2. Research Dataset
+### 2. Object Dataset
 This code assumes you have an object dataset. 
 * If you do not have your own simulation data and want to make sure that your dataset format matches the format used in this code, you can download my sample dataset here: [Raw data v1.0](https://github.com/Patsrnpt/YT-Simulation/releases/tag/v1.0).
 
