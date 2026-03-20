@@ -33,8 +33,36 @@ def create_multiple_filter_files(output_dir, wl_initial, wl_final, num_filters =
     # calculate resolution of the jwst filter
     jwst_resolution = calculate_original_resolution(jwst_wavelength) # this resolution will be used as a resolution of each filter
 
-    # wavelength grid of multiple filters to calculate spacing between each data point
-    wavelength_filter_grid = np.logspace(np.log10(wl_initial), np.log10(wl_final), num_filters + 1) # this variable will tell you where the bin edge is
+    # define balmer break wavelength
+    balmer_wl = 0.3645 # in microns
+
+    # check if balmer break is in the wavelength range
+    if (wl_initial < balmer_wl) and (balmer_wl < wl_final):
+
+        # convert to log space
+        log_wl_initial = np.log10(wl_initial)
+        log_wl_final = np.log10(wl_final)
+        log_balmer_wl = np.log10(balmer_wl)
+
+        # calculate fraction in log space
+        f1 = (log_balmer_wl - log_wl_initial)/(log_wl_final - log_wl_initial)
+        f2 = (log_wl_final - log_balmer_wl)/(log_wl_final - log_wl_initial)
+
+        # calculate number of filters in each region (flooring)
+        N1 = int(num_filters * f1)
+        N2 = int(num_filters * f2)
+
+        # create wavelength grid for each region
+        wavelength_filter_grid_1 = np.logspace(log_wl_initial, log_balmer_wl, N1 + 1)
+        wavelength_filter_grid_2 = np.logspace(log_balmer_wl, log_wl_final, N2 + 1)
+
+        # combine grid and remove duplicate balmer point
+        wavelength_filter_grid = np.concatenate((wavelength_filter_grid_1[:-1], wavelength_filter_grid_2))
+
+    else:
+        
+        # wavelength grid of multiple filters to calculate spacing between each data point
+        wavelength_filter_grid = np.logspace(np.log10(wl_initial), np.log10(wl_final), num_filters + 1) # this variable will tell you where the bin edge is
 
     # calculate number of data points in each filter to match with jwst resolution using the first filter
     central_wavelength = (wavelength_filter_grid[0] + wavelength_filter_grid[1])/2
@@ -45,32 +73,38 @@ def create_multiple_filter_files(output_dir, wl_initial, wl_final, num_filters =
     # calculate spacing between data points
     wavelength_spacing = (wavelength_filter_grid[1] - wavelength_filter_grid[0])/(num_points - 1)
 
-    # create wavelength array using the same spacing from calculation above
-    wl_array = np.arange(wl_initial, wl_final, wavelength_spacing) # x-axis of all filters
+    # create wavelength array using linspace to include last point exactly
+    wl_array = np.linspace(wl_initial, wl_final, int((wl_final - wl_initial)/wavelength_spacing) + 1) # x-axis of all filters
 
     # empty array of filters
     filter_paths = []
 
     # for loop to create filters
-    for i in range(num_filters):
+    for i in range(len(wavelength_filter_grid) - 1):
         # empty array of transmission
         transmission = np.zeros_like(wl_array)
 
         # consider range of each filter
-        mask = (wl_array >= wavelength_filter_grid[i]) & (wl_array < wavelength_filter_grid[i + 1])
+        if i == len(wavelength_filter_grid) - 2:
+            # include last point for the last bin
+            mask = (wl_array >= wavelength_filter_grid[i]) & (wl_array <= wavelength_filter_grid[i + 1])
+        else:
+            mask = (wl_array >= wavelength_filter_grid[i]) & (wl_array < wavelength_filter_grid[i + 1])
 
         # transmission in the consider range = 1
         transmission[mask] = 1
 
-        # save filter files
-        file_name = f"filter_{i+1}.txt"
-        file_path = os.path.join(output_dir, file_name)
+        # skip empty filters (in case flooring produced 0 points)
+        if np.any(transmission):
+            # save filter files
+            file_name = f"filter_{i+1}.txt"
+            file_path = os.path.join(output_dir, file_name)
 
-        # save as two columns: wavelength and transmission
-        data_to_save = np.column_stack((wl_array, transmission))
-        np.savetxt(file_path, data_to_save, header = "Wavelength[Microns] Transmission", fmt = "%.6f")
-        filter_paths.append(file_path)
+            # save as two columns: wavelength and transmission
+            data_to_save = np.column_stack((wl_array, transmission))
+            np.savetxt(file_path, data_to_save, header = "Wavelength[Microns] Transmission", fmt = "%.6f")
+            filter_paths.append(file_path)
 
-    print(f"Successfully created {num_filters} filters in {output_dir}")
+    print(f"Successfully created {len(filter_paths)} filters in {output_dir}")
 
     return wavelength_filter_grid, filter_paths
